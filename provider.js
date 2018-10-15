@@ -46,11 +46,17 @@ class ComponentsDataProvider {
     }
 
     getContent() {
-        const path = vscode.window.activeTextEditor.document.fileName;
-        const body = ast.parse(path);
+        this.path = vscode.window.activeTextEditor.document.fileName;
+
+        if (!this.isSupportedFile()) {
+            console.log('unsupported file');
+            return [];
+        };
+
+        const body = ast.parse(this.path);
         return ast.getImports(body).map(componentName => {
-            const path = tree.getCoreComponentPath(componentName);
-            const componentAst = ast.parse(path);
+            const componentPath = tree.getCoreComponentPath(componentName);
+            const componentAst = ast.parse(componentPath);
             const propTypes = ast.getPropTypes(componentAst);
             return { 
                 label: componentName,
@@ -58,6 +64,11 @@ class ComponentsDataProvider {
                 propTypes
             };
         });    
+    }
+
+    isSupportedFile() {
+        const supported = ['.jsx', '.js'];
+        return supported.some(ext => ext === path.extname(this.path));
     }
 }
 
