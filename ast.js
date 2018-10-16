@@ -37,8 +37,11 @@ exports.getPropTypes = function(ast) {
 }
 
 exports.getImports = function(ast) {
-    const imports = ast.filter(node => node.type === 'ImportDeclaration');
-    const coreImports = imports.filter(node => node.source.value === '_/core');
-    const core = coreImports.length ? coreImports[0].specifiers.map(importNode => importNode.imported.name) : [];
-    return core;
+    const imports = ast.filter(node => node.type === 'ImportDeclaration' && node.source.value.startsWith('_/'));
+    return imports.map(node => {
+        return {
+            type: node.source.value,
+            components: node.specifiers.map(importNode => importNode.imported.name)
+        }
+    });
 }

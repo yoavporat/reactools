@@ -28,20 +28,19 @@ class ComponentsDataProvider {
 
     getTreeItem(item) {
         let treeItem = new vscode.TreeItem(item.label, this.getCollapsedState(item.type));
-        treeItem.iconPath = item.type === 'msg' ? null : {
-            light: this.context.asAbsolutePath(path.join('resources', 'icons', 'experimental_light.svg')),
-            dark: this.context.asAbsolutePath(path.join('resources', 'icons', 'experimental_dark.svg'))
-        }
+        treeItem.iconPath = item.type === 'msg' 
+            ? null 
+            : this.context.asAbsolutePath(path.join('resources', 'icons', `${item.type}.svg`));        
         return treeItem;
     }
 
     getCollapsedState(type) {
         switch(type) {
-        case 'prop':
-        case 'msg':
-            return vscode.TreeItemCollapsibleState.None;
-        default:
-            return vscode.TreeItemCollapsibleState.Collapsed;
+            case 'prop':
+            case 'msg':
+                return vscode.TreeItemCollapsibleState.None;
+            default:
+                return vscode.TreeItemCollapsibleState.Collapsed;
         }
     }
 
@@ -53,17 +52,23 @@ class ComponentsDataProvider {
             return [];
         };
 
+        const content = [];
         const body = ast.parse(this.path);
-        return ast.getImports(body).map(componentName => {
-            const componentPath = tree.getCoreComponentPath(componentName);
-            const componentAst = ast.parse(componentPath);
-            const propTypes = ast.getPropTypes(componentAst);
-            return { 
-                label: componentName,
-                type: 'core',
-                propTypes
-            };
-        });    
+        ast.getImports(body).forEach(importData => {
+            const type = importData.type.replace('_/', '');
+            importData.components.map(componentName => {
+                const componentPath = tree.resolveCommonPath(componentName, type);                
+                const componentAst = ast.parse(componentPath);
+                const propTypes = ast.getPropTypes(componentAst);
+                content.push({ 
+                    label: componentName,
+                    type: type.replace('mobile-layout', 'layout'),
+                    propTypes
+                });
+            });
+        });
+
+        return content;
     }
 
     isSupportedFile() {
