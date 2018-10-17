@@ -1,16 +1,20 @@
 const path = require('path');
-
 const DUDA_ROOT = path.resolve('c:/Users/yoavp/Code/duda/DudaRoot/client/src/modules');
 
-exports.resolveCommonPath = function(name, type) {
+exports.resolveCommonPath = function(name, type, root) {
     switch (type) {
         case 'mobile-layout':
             return path.join(DUDA_ROOT, `common/components/${type}/${name}/${name}.jsx`);
         case 'fields':
             const fieldName = camelize(name.replace('Field', ''));
             return path.join(DUDA_ROOT, `common/components/${type}/field-${fieldName}/${name}.jsx`);
-        default:
+        case 'core':
+        case 'layout':
             return path.join(DUDA_ROOT, `common/components/${type}/${type}-${name.toLowerCase()}/${name}.jsx`);
+        default:
+            const rootDir = path.dirname(root);
+            const relativePath = path.join(rootDir, `${type}.jsx`);
+            return path.normalize(relativePath);
     }
 };
 

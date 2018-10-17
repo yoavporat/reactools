@@ -37,11 +37,19 @@ exports.getPropTypes = function(ast) {
 }
 
 exports.getImports = function(ast) {
-    const imports = ast.filter(node => node.type === 'ImportDeclaration' && node.source.value.startsWith('_/'));
+    const imports = ast.filter(filterImports);
     return imports.map(node => {
         return {
             type: node.source.value,
-            components: node.specifiers.map(importNode => importNode.imported.name)
+            components: node.specifiers.map(importNode => importNode.imported ? importNode.imported.name : importNode.local.name)
         }
     });
+}
+
+function filterImports(node) {
+    return node.type === 'ImportDeclaration' &&
+        !node.source.value.endsWith('.scss') &&
+        node.source.value !== 'base' && node.source.value !== 'lodash' &&
+        node.source.value !== 'common/services/' &&
+        !node.source.value.startsWith('code/') && !node.source.value.startsWith('utils/');
 }

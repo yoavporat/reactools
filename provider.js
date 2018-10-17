@@ -28,9 +28,7 @@ class ComponentsDataProvider {
 
     getTreeItem(item) {
         let treeItem = new vscode.TreeItem(item.label, this.getCollapsedState(item.type));
-        treeItem.iconPath = item.type === 'msg' 
-            ? null 
-            : this.context.asAbsolutePath(path.join('resources', 'icons', `${item.type}.svg`));        
+        treeItem.iconPath = this.getIcons(item.type);
         return treeItem;
     }
 
@@ -41,6 +39,17 @@ class ComponentsDataProvider {
                 return vscode.TreeItemCollapsibleState.None;
             default:
                 return vscode.TreeItemCollapsibleState.Collapsed;
+        }
+    }
+
+    getIcons(type) {
+        switch(type) {
+            case 'core':
+            case 'fields':
+            case 'layout':
+                return this.context.asAbsolutePath(path.join('resources', 'icons', `${type}.svg`));
+            default:
+                return null;
         }
     }
 
@@ -57,7 +66,7 @@ class ComponentsDataProvider {
         ast.getImports(body).forEach(importData => {
             const type = importData.type.replace('_/', '');
             importData.components.map(componentName => {
-                const componentPath = tree.resolveCommonPath(componentName, type);                
+                const componentPath = tree.resolveCommonPath(componentName, type, this.path);
                 const componentAst = ast.parse(componentPath);
                 const propTypes = ast.getPropTypes(componentAst);
                 content.push({ 
