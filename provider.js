@@ -50,6 +50,7 @@ class ComponentsDataProvider {
             case 'core':
             case 'fields':
             case 'layout':
+            case 'prop':
                 return this.context.asAbsolutePath(path.join('resources', 'icons', `${type}.svg`));
             default:
                 return null;
