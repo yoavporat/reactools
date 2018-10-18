@@ -2,7 +2,7 @@
     "name": "reactools",
     "displayName": "reactools",
     "description": "",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "publisher": "Yoav",
     "engines": {
         "vscode": "^1.24.0"
