@@ -9,9 +9,12 @@ class ComponentsDataProvider {
     
     constructor(context) {
         this.context = context;
-        this.path = vscode.window.activeTextEditor.document.fileName;
         this.onDidChangeTreeDataEvent = new vscode.EventEmitter();
 	    this.onDidChangeTreeData = this.onDidChangeTreeDataEvent.event;
+    }
+
+    activeEditorPath() {
+        return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.fileName;
     }
 
     refresh() {
@@ -54,19 +57,18 @@ class ComponentsDataProvider {
     }
 
     getContent() {
-        this.path = vscode.window.activeTextEditor.document.fileName;
-
-        if (!this.isSupportedFile()) {
+        const activeEditor = this.activeEditorPath();
+        if (!this.isSupportedFile() || !activeEditor) {
             console.log('unsupported file');
             return [];
         };
 
         const content = [];
-        const body = ast.parse(this.path);
+        const body = ast.parse(activeEditor);
         ast.getImports(body).forEach(importData => {
             const type = importData.type.replace('_/', '');
             importData.components.map(componentName => {
-                const componentPath = tree.resolveCommonPath(componentName, type, this.path);
+                const componentPath = tree.resolveCommonPath(componentName, type, activeEditor);
                 const componentAst = ast.parse(componentPath);
                 const propTypes = ast.getPropTypes(componentAst);
                 content.push({ 
@@ -82,7 +84,11 @@ class ComponentsDataProvider {
 
     isSupportedFile() {
         const supported = ['.jsx', '.js'];
-        return supported.some(ext => ext === path.extname(this.path));
+        const activeEditor = this.activeEditorPath();
+        if (activeEditor) {
+            return supported.some(ext => ext === path.extname(activeEditor));            
+        }
+        return false;
     }
 }
 

@@ -2,7 +2,7 @@ const parser = require('@babel/parser');
 const fs = require('fs');
 
 exports.parse = function(path) {
-    // console.log('parsing AST for', path);
+    console.log('parsing AST for', path);
     const file = fs.readFileSync(path, { encoding: 'utf8' });
     const options = {
         sourceType: 'module',
@@ -47,9 +47,6 @@ exports.getImports = function(ast) {
 }
 
 function filterImports(node) {
-    return node.type === 'ImportDeclaration' &&
-        !node.source.value.endsWith('.scss') &&
-        node.source.value !== 'base' && node.source.value !== 'lodash' &&
-        node.source.value !== 'common/services/' &&
-        !node.source.value.startsWith('code/') && !node.source.value.startsWith('utils/');
+    return node.type === 'ImportDeclaration' && !node.source.value.endsWith('.scss') &&
+        (node.source.value.startsWith('.') || node.source.value.startsWith('_/'));
 }

@@ -1,16 +1,21 @@
+const vscode = require('vscode');
 const path = require('path');
-const DUDA_ROOT = path.resolve('c:/Users/yoavp/Code/duda/DudaRoot/client/src/modules');
 
 exports.resolveCommonPath = function(name, type, root) {
-    switch (type) {
+    const rootPath = vscode.workspace.getConfiguration('reactools').get('modulesPath');
+    const importType = type.includes('/') ? type.split('/')[0] : type;
+    console.log(name, type, root);
+    switch (importType) {
         case 'mobile-layout':
-            return path.join(DUDA_ROOT, `common/components/${type}/${name}/${name}.jsx`);
+            return path.join(rootPath, `common/components/${type}/${name}/${name}.jsx`);
         case 'fields':
             const fieldName = camelize(name.replace('Field', ''));
-            return path.join(DUDA_ROOT, `common/components/${type}/field-${fieldName}/${name}.jsx`);
+            return path.join(rootPath, `common/components/${type}/field-${fieldName}/${name}.jsx`);
         case 'core':
         case 'layout':
-            return path.join(DUDA_ROOT, `common/components/${type}/${type}-${name.toLowerCase()}/${name}.jsx`);
+            return type !== importType 
+                ? path.join(rootPath, `common/components/${type}.jsx`)
+                : path.join(rootPath, `common/components/${type}/${type}-${name.toLowerCase()}/${name}.jsx`);
         default:
             const rootDir = path.dirname(root);
             const relativePath = path.join(rootDir, `${type}.jsx`);

@@ -31,6 +31,16 @@
                     "name": "PropTypes"
                 }
             ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "Reactools Configuration",
+            "properties": {
+                "reactools.modulesPath": {
+                    "type": "string",
+                    "description": "Modules Root Path"
+                }
+            }
         }
     },
     "scripts": {
